@@ -1,6 +1,6 @@
 # OAuth for SolidStart
 
-This package returns the `name`, `email` and `image` of authentificated user through third party services (google, discord, etc)
+This package returns the `name`, `email` and `image` of authentificated user through third party services (for now supporting google, discord, github, spotify). 
 
 ## Configuration
 api/oauth/[...oauth].ts
@@ -52,3 +52,4 @@ export async function signIn({ id }: { id: string }, r?: string) {
 }
 ```
 
+**Contribution for more providers support is much appreciated**
