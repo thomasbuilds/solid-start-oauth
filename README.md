@@ -1,11 +1,28 @@
 # OAuth for SolidStart
 
-This package returns the `name`, `email` and `image` of authentificated user through third party services (for now supporting google, discord, github, spotify). 
+This package returns the `name`, `email` and `image` of authentificated user through third party services (google, discord, github, spotify).
 
 ## Configuration
-api/oauth/[...oauth].ts
 
 ```ts
+//login.ts
+export default function OAuth() {
+  const requestLogin = useOAuthLogin();
+
+  return (
+    <div>
+      <a href={requestLogin("oauth/google")}>
+        <GoogleIcon />
+      </a>
+      <a href={requestLogin("oauth/github")}>
+        <GithubIcon />
+      </a>
+    </div>
+  );
+}
+```
+```ts
+//api/oauth/[...oauth].ts
 import OAuth, { type Configuration } from "solid-start-oauth"
 
 const configuration: Configuration = {
@@ -43,10 +60,10 @@ export async function signUp({ name, email, image }: User) {
   });
 }
 
-export async function signIn({ id }: { id: string }, r?: string) {
+export async function signIn({ id }: { id: string }, redirectTo?: string) {
   const session = await storage.getSession();
   session.set("id", id);
-  return redirect(r || "/account", {
+  return redirect(redirectTo || "/account", {
     headers: { "Set-Cookie": await storage.commitSession(session) },
   });
 }
