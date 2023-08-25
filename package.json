@@ -1,0 +1,17 @@
+{
+  "name": "solid-start-oauth",
+  "version": "1.0.0",
+  "description": "Efficient OAuth for SolidStart",
+  "type": "module",
+  "main": "./index.ts",
+  "types": "./index.ts",
+  "exports": {
+    ".": "./index.ts"
+  },
+  "author": "SolidFlow",
+  "license": "MIT",
+  "devDependencies": {
+    "solid-start": "^0.3.4",
+    "typescript": "^5.2.2"
+  }
+}
