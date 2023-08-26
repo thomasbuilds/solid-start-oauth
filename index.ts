@@ -1,70 +1,69 @@
 import { useLocation, useSearchParams } from "solid-start";
 import { type APIEvent, redirect } from "solid-start/api";
-import { encode } from "./utils";
 import * as github from "./providers/github";
 import * as google from "./providers/google";
 import * as discord from "./providers/discord";
 import * as spotify from "./providers/spotify";
-import type { Provider, Configuration } from "./types";
-
-export function useOAuthLogin() {
-  const location = useLocation();
-  const [searchParams] = useSearchParams();
-  return (path: string) => {
-    if (typeof path !== "string" || !path) throw new Error("invalid path");
-    const params = encode({
-      fallback: location.pathname,
-      redirect: searchParams.redirect,
-    });
-    return `/api/${path}?${params}`;
-  };
-}
+import { encode } from "./utils";
+import type { Provider, Configuration, Providers } from "./types";
 
 export default function OAuth(config: Configuration) {
-  const request = requestProvider(config);
-  if (!config.handler)
-    throw new Error("handler function missing in configuration");
-  return async ({ request: { url }, params: { oauth } }: APIEvent) => {
-    switch (oauth) {
+  const login = handleProviders(config);
+  if (!config.handler) throw new TypeError("handler missing in configuration");
+  return async ({ request: { url }, params }: APIEvent) => {
+    const [provider] = Object.values(params);
+    switch (provider) {
       case "google":
-        return request(google, new URL(url));
+        return login(google, new URL(url));
       case "github":
-        return request(github, new URL(url));
+        return login(github, new URL(url));
       case "spotify":
-        return request(spotify, new URL(url));
+        return login(spotify, new URL(url));
       case "discord":
-        return request(discord, new URL(url));
+        return login(discord, new URL(url));
     }
   };
 }
 
-function requestProvider(config: Configuration) {
-  const params: Record<string, string> = {};
+function handleProviders(config: Configuration) {
+  let errorURL: string;
+  let redirectURL: string | undefined;
   return async (
     { provider, requestCode, requestToken, requestUser }: Provider,
     { searchParams, origin, pathname }: URL
   ) => {
     const identifiers = config[provider];
     if (!identifiers?.id || !identifiers?.secret)
-      throw new Error(`malformed ${provider} configuration`);
+      throw new TypeError(`malformed ${provider} configuration`);
     const configAPI = { ...identifiers, redirect: origin + pathname };
     if (searchParams.has("fallback")) {
-      const errorURL = searchParams.get("fallback");
-      const redirectURL = searchParams.get("redirect");
-      if (typeof errorURL !== "string" || !errorURL)
-        throw new Error("no fallback path specified");
-      params.fallback = errorURL;
-      if (typeof redirectURL === "string" && redirectURL)
-        params.redirect = redirectURL;
+      const fallback = searchParams.get("fallback");
+      if (typeof fallback !== "string" || !fallback)
+        throw new Error("fallback path missing");
+      errorURL = fallback;
+      redirectURL = searchParams.get("redirect") || undefined;
       return redirect(requestCode(configAPI));
     }
     try {
       const token = await requestToken(searchParams, configAPI);
       const user = await requestUser(token);
-      return await config.handler(user, params.redirect);
+      return await config.handler(user, redirectURL);
     } catch ({ message }: any) {
-      return redirect(`${params.fallback}?error=${message}`);
+      return redirect(`${errorURL}?error=${message}`);
     }
+  };
+}
+
+export function useOAuthLogin(folder?: string) {
+  const location = useLocation();
+  const [searchParams] = useSearchParams();
+  return (provider: Providers) => {
+    const params = encode({
+      fallback: location.pathname,
+      redirect: searchParams.redirect,
+    });
+    const path = folder ? folder + "/" : "";
+    return `/api/${path}${provider}?${params}`;
   };
 }
 

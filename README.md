@@ -1,29 +1,22 @@
-# OAuth for SolidStart
+# OAuth2 for SolidStart
 
-This package returns the `name`, `email` and `image` of authentificated user through third party services (google, discord, github, spotify).
+This package returns the `name`, `email` and `image` of user authenticated through third party services (for now: Google, Discord, GitHub, Spotify).
+
+## Installation
+
+```bash
+# npm
+npm install solid-start-oauth
+
+# pnpm
+pnpm add solid-start-oauth
+```
 
 ## Configuration
 
 ```ts
-//login.ts
-export default function OAuth() {
-  const requestLogin = useOAuthLogin();
-
-  return (
-    <div>
-      <a href={requestLogin("oauth/google")}>
-        <GoogleIcon />
-      </a>
-      <a href={requestLogin("oauth/github")}>
-        <GithubIcon />
-      </a>
-    </div>
-  );
-}
-```
-```ts
 //api/oauth/[...oauth].ts
-import OAuth, { type Configuration } from "solid-start-oauth"
+import OAuth, { type Configuration } from "solid-start-oauth";
 
 const configuration: Configuration = {
   google: {
@@ -41,18 +34,43 @@ const configuration: Configuration = {
     const dbUser = await database.getUser("email", user.email);
     if (dbUser) return await signIn(dbUser, redirect);
     return await signUp(user);
-    ...
   },
 };
 
 export const GET = OAuth(configuration);
 ```
 
-You then use solid-start sessions to authentificate user in your app:
+- Add the path of the catch-all route if it's not directly under `/api` folder when calling `useOAuthLogin`.
+- In case of error, you are redirected to page requesting login and `error` parameter specifies reason.
+- Adding a `redirect` search parameter on page requesting login gives you access to the value as argument on handler function.
+
+```tsx
+//login.ts
+export default function Login() {
+  const requestLogin = useOAuthLogin("oauth");
+
+  return (
+    <div>
+      <a href={requestLogin("google")}>
+        <GoogleIcon />
+      </a>
+      <a href={requestLogin("github")}>
+        <GithubIcon />
+      </a>
+    </div>
+  );
+}
+```
+
+The package doesn’t provide the actual authentication for your app. This provides you complete control over redirections and you can seamlessly integrate multiple authentication methods sharing the same logic.
 
 ```ts
 export async function signUp({ name, email, image }: User) {
-  const { id } = await database.createUser({ name: name, email: email, image: image });
+  const { id } = await database.createUser({
+    name: name,
+    email: email,
+    image: image,
+  });
   const session = await storage.getSession();
   session.set("id", id);
   return redirect("/account", {
@@ -69,4 +87,6 @@ export async function signIn({ id }: { id: string }, redirectTo?: string) {
 }
 ```
 
-**Contribution for more providers support is much appreciated**
+## Contributions
+
+Please open issues for bugs and we much appreciate contributions regarding more provider support.
