@@ -41,7 +41,7 @@ function handleProviders(config: Configuration) {
       if (typeof fallback !== "string" || !fallback)
         throw new Error("fallback path missing");
       errorURL = fallback;
-      redirectURL = searchParams.get("redirect") || undefined;
+      redirectURL = searchParams.get("redirect") ?? undefined;
       return redirect(requestCode(configAPI));
     }
     try {
