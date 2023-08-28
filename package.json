@@ -1,6 +1,6 @@
 {
   "name": "solid-start-oauth",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "Efficient OAuth for SolidStart",
   "homepage": "https://github.com/solidflow-org/solid-start-oauth#readme",
   "repository": {
@@ -11,8 +11,9 @@
     "url": "https://github.com/solidflow-org/solid-start-oauth/issues"
   },
   "type": "module",
-  "main": "./index.ts",
-  "types": "./index.ts",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "files": ["src"],
   "author": "SolidFlow <contact@solidflow.org>",
   "keywords": [
     "oauth",
@@ -20,6 +21,7 @@
   ],
   "license": "MIT",
   "devDependencies": {
+    "@types/node": "^20.5.7",
     "solid-start": "^0.3.4"
   }
 }

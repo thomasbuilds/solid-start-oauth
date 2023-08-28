@@ -2,24 +2,18 @@ export type Providers = "discord" | "google" | "github" | "spotify";
 
 export type Identifiers = { id: string; secret: string; state?: string };
 
-export type Parameters = Identifiers & { redirect: string };
-
 export type User = { name: string; email: string; image: string | undefined };
 
 export type Configuration = Record<Providers, Identifiers> & {
   handler: (user: User, redirect?: string) => unknown;
 };
 
-export type Token = { token_type: string; access_token: string };
-
-export type Provider = {
-  provider: Providers;
-  requestCode: (config: Parameters) => string;
+export type Methods = {
+  requestCode: (config: Identifiers & { redirect: string }) => string;
   requestToken: (
-    searchParams: URLSearchParams,
-    config: Parameters
-  ) => Promise<Token>;
-  requestUser: (token: Token) => Promise<User>;
+    config: Identifiers & { redirect: string; code: string }
+  ) => Promise<Record<string, string>>;
+  requestUser: (token: string) => Promise<User>;
 };
 
 export type Google = {
