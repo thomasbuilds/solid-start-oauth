@@ -7,3 +7,8 @@ export const encode = (params: Record<string, any>) =>
         : `${key}=${encodeURIComponent(value)}`
     )
     .join("&");
+
+export const formatEnv = (env: Env): Record<string, string> =>
+  Object.fromEntries(
+    Object.entries(env).filter(([_, value]) => typeof value === "string")
+  );

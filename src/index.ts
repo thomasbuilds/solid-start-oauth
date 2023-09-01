@@ -5,14 +5,15 @@ import {
   useSearchParams,
 } from "solid-start";
 import providers from "./providers";
-import { encode } from "./utils";
+import { encode, formatEnv } from "./utils";
 import type { Configuration, Methods, Providers } from "./types";
 
-export default function OAuth(config: Configuration) {
+export default function OAuth(configuration: Configuration) {
   let errorURL: string;
   let redirectURL: string | undefined;
 
-  return async ({ request: { url }, params }: APIEvent) => {
+  return async ({ request: { url }, params, env }: APIEvent) => {
+    const config = configuration(formatEnv(env));
     const [provider] = Object.values(params);
     const { searchParams, origin, pathname } = new URL(url);
 
@@ -37,10 +38,10 @@ export default function OAuth(config: Configuration) {
     }
 
     try {
-      const code = searchParams.get("code");
-      if (!code) throw new Error("missing code parameter in url");
       const error = searchParams.get("error");
       if (error) throw new Error(error);
+      const code = searchParams.get("code");
+      if (!code) throw new Error("missing code parameter in url");
       const { token_type, access_token } = await requestToken({
         ...apiConfig,
         code: code,

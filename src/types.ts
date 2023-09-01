@@ -4,7 +4,10 @@ export type Identifiers = { id: string; secret: string; state?: string };
 
 export type User = { name: string; email: string; image: string | undefined };
 
-export type Configuration = Record<Providers, Identifiers> & {
+export type Configuration = (env: Record<string, string>) => Record<
+  Providers,
+  Identifiers
+> & {
   handler: (user: User, redirect?: string) => unknown;
 };
 

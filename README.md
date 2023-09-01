@@ -14,20 +14,29 @@ pnpm add solid-start-oauth
 
 ## Configuration
 
+The configuration function injects an object holding environment variables as argument. This is useful when `process` is not available (with Cloudflare for example). Remember to have `vite.config.ts` as follows:
+
+```ts
+export default defineConfig(() => ({
+  plugins: [solid({ ssr: true, adapter: cloudflare({ envPath: true }) })],
+  ...
+})
+```
+
 ```ts
 //api/oauth/[...oauth].ts
 import OAuth, { type Configuration } from "solid-start-oauth";
 
-const configuration: Configuration = {
+const configuration: Configuration = env => ({
   google: {
-    id: process.env.GOOGLE_ID as string,
+    id: process.env.GOOGLE_ID as string, //process for NodeJS
     secret: process.env.GOOGLE_SECRET as string,
     state: process.env.STATE as string, //optional
   },
   github: {
-    id: process.env.GITHUB_ID as string,
-    secret: process.env.GITHUB_SECRET as string,
-    state: process.env.STATE as string,
+    id: env.GITHUB_ID as string, //for Cloudflare
+    secret: env.GITHUB_SECRET as string,
+    state: env.STATE as string,
   },
   async handler(user, redirect) {
     //use solid-start sessions to store cookie
@@ -35,7 +44,7 @@ const configuration: Configuration = {
     if (dbUser) return await signIn(dbUser, redirect);
     return await signUp(user);
   },
-};
+});
 
 export const GET = OAuth(configuration);
 ```
