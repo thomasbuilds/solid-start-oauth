@@ -13,7 +13,10 @@ export default function OAuth(configuration: Configuration) {
   let redirectURL: string | undefined;
 
   return async ({ request: { url }, params, env }: APIEvent) => {
-    const config = configuration(formatEnv(env));
+    const config =
+      typeof configuration === "function"
+        ? configuration(formatEnv(env))
+        : configuration;
     const [provider] = Object.values(params);
     const { searchParams, origin, pathname } = new URL(url);
 

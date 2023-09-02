@@ -2,27 +2,29 @@ import { encode } from "../utils";
 import type { Discord, Methods } from "../types";
 
 export default {
-  requestCode({ id, state }) {
+  requestCode({ id, state, redirect }) {
     const url = "https://discord.com/oauth2/authorize";
     const params = encode({
       response_type: "code",
       scope: ["identify", "email"],
       client_id: id,
       state: state,
+      redirect_uri: redirect,
       prompt: "none",
     });
     return url + "?" + params;
   },
 
-  async requestToken({ id, secret, code }) {
+  async requestToken({ id, secret, code, redirect }) {
     const response = await fetch("https://discord.com/api/v10/oauth2/token", {
       method: "POST",
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
       body: encode({
         client_id: id,
         client_secret: secret,
-        code: code,
         grant_type: "authorization_code",
+        code: code,
+        redirect_uri: redirect,
       }),
     });
     if (response.status !== 200)

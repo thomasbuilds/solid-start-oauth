@@ -14,14 +14,7 @@ pnpm add solid-start-oauth
 
 ## Configuration
 
-The configuration function injects an object holding environment variables as argument. This is useful when `process` is not available (with Cloudflare for example). Remember to have `vite.config.ts` as follows:
-
-```ts
-export default defineConfig(() => ({
-  plugins: [solid({ ssr: true, adapter: cloudflare({ envPath: true }) })],
-  ...
-})
-```
+Your configuration can either be an object or a function. Use it as a function to have your variables injected in argument when your environment doesn’t support NodeJS (with Cloudflare for example).
 
 ```ts
 //api/oauth/[...oauth].ts

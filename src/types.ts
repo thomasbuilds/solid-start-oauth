@@ -4,12 +4,11 @@ export type Identifiers = { id: string; secret: string; state?: string };
 
 export type User = { name: string; email: string; image: string | undefined };
 
-export type Configuration = (env: Record<string, string>) => Record<
-  Providers,
-  Identifiers
-> & {
+export type Options = Record<Providers, Identifiers> & {
   handler: (user: User, redirect?: string) => unknown;
 };
+
+export type Configuration = (env: Record<string, string>) => Options | Options;
 
 export type Methods = {
   requestCode: (config: Identifiers & { redirect: string }) => string;
