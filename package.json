@@ -1,6 +1,6 @@
 {
   "name": "solid-start-oauth",
-  "version": "1.1.4",
+  "version": "1.1.5",
   "description": "Efficient OAuth for SolidStart",
   "homepage": "https://github.com/solidflow-org/solid-start-oauth#readme",
   "repository": {

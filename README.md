@@ -42,14 +42,14 @@ const configuration: Configuration = env => ({
 export const GET = OAuth(configuration);
 ```
 
-- Add the path of the catch-all route if it's not directly under `/api` folder when calling `useOAuthLogin`.
 - In case of error, you are redirected to page requesting login and `error` parameter specifies reason.
-- Adding a `redirect` search parameter on page requesting login gives you access to the value as argument on handler function.
+- Adding a `redirect` search parameter on page requesting login gives you access to the value on handler function.
+- Add the path of the catch-all route if it's not directly under `/api` folder when calling `useOAuthLogin`.
 
 ```tsx
 //login.ts
 export default function Login() {
-  const requestLogin = useOAuthLogin("oauth");
+  const requestLogin = useOAuthLogin("oauth"); //the folder (api/oauth/)
 
   return (
     <div>

@@ -8,7 +8,9 @@ export type Options = Record<Providers, Identifiers> & {
   handler: (user: User, redirect?: string) => unknown;
 };
 
-export type Configuration = (env: Record<string, string>) => Options | Options;
+export type Configuration =
+  | Options
+  | ((env: Record<string, string>) => Options);
 
 export type Methods = {
   requestCode: (config: Identifiers & { redirect: string }) => string;
