@@ -1,6 +1,6 @@
 # OAuth2 for SolidStart
 
-This package returns the `name`, `email` and `image` of user authenticated through third party services (for now: Google, Discord, GitHub, Spotify).
+This package returns the `name`, `email` and `image` of user authenticated through third party services (Discord, GitHub, Google, Spotify).
 
 ## Installation
 
@@ -14,7 +14,7 @@ pnpm add solid-start-oauth
 
 ## Configuration
 
-Your configuration can either be an object or a function. Use it as a function to have your variables injected in argument when your environment doesn’t support NodeJS (with Cloudflare for example).
+Your configuration can either be an object or a function. Use it as a function to have your variables in argument when your environment doesn't support `process.env` or `import.meta.env` (for example with Cloudflare).
 
 ```ts
 //api/oauth/[...oauth].ts
@@ -22,15 +22,12 @@ import OAuth, { type Configuration } from "solid-start-oauth";
 
 const configuration: Configuration = env => ({
   google: {
-    id: process.env.GOOGLE_ID as string, //process for NodeJS
+    id: process.env.GOOGLE_ID as string,
     secret: process.env.GOOGLE_SECRET as string,
-    state: process.env.STATE as string, //optional
+    state: process.env.STATE, //optional XSRF protection
   },
-  github: {
-    id: env.GITHUB_ID as string, //for Cloudflare
-    secret: env.GITHUB_SECRET as string,
-    state: env.STATE as string,
-  },
+  //or
+  google: { id: env.GOOGLE_ID, secret: env.GOOGLE_SECRET, state: env.STATE },
   async handler(user, redirect) {
     //use solid-start sessions to store cookie
     const dbUser = await database.getUser("email", user.email);
@@ -47,7 +44,7 @@ export const GET = OAuth(configuration);
 - Add the path of the catch-all route if it's not directly under `/api` folder when calling `useOAuthLogin`.
 
 ```tsx
-//login.ts
+//login.tsx
 export default function Login() {
   const requestLogin = useOAuthLogin("oauth"); //the folder (api/oauth/)
 

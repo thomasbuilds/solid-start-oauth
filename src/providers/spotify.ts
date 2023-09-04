@@ -2,30 +2,26 @@ import { encode } from "../utils";
 import type { Methods, Spotify } from "../types";
 
 export default {
-  requestCode({ id, redirect, state }) {
+  requestCode({ id, redirect_uri, state }) {
     const url = "https://accounts.spotify.com/authorize";
     const params = encode({
       response_type: "code",
-      client_id: id,
       scope: "user-read-email",
-      redirect_uri: redirect,
-      state: state,
+      client_id: id,
+      redirect_uri,
+      state,
     });
     return url + "?" + params;
   },
 
-  async requestToken({ id, secret, redirect, code }) {
+  async requestToken({ id, secret, code, redirect_uri }) {
     const response = await fetch("https://accounts.spotify.com/api/token", {
       method: "POST",
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",
         Authorization: "Basic " + btoa(id + ":" + secret),
       },
-      body: encode({
-        code: code,
-        grant_type: "authorization_code",
-        redirect_uri: redirect,
-      }),
+      body: encode({ grant_type: "authorization_code", code, redirect_uri }),
     });
     if (response.status !== 200)
       throw new Error("failed to fetch access token");

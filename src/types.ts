@@ -1,21 +1,19 @@
-export type Providers = "discord" | "google" | "github" | "spotify";
+import type { Providers } from "./providers";
 
 export type Identifiers = { id: string; secret: string; state?: string };
 
 export type User = { name: string; email: string; image: string | undefined };
 
-export type Options = Record<Providers, Identifiers> & {
+export type Object = Record<Providers, Identifiers> & {
   handler: (user: User, redirect?: string) => unknown;
 };
 
-export type Configuration =
-  | Options
-  | ((env: Record<string, string>) => Options);
+export type Configuration = Object | ((env: Record<string, string>) => Object);
 
 export type Methods = {
-  requestCode: (config: Identifiers & { redirect: string }) => string;
+  requestCode: (config: Identifiers & { redirect_uri: string }) => string;
   requestToken: (
-    config: Identifiers & { redirect: string; code: string }
+    config: Identifiers & { redirect_uri: string; code: string }
   ) => Promise<Record<string, string>>;
   requestUser: (token: string) => Promise<User>;
 };

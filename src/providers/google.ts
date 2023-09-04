@@ -2,29 +2,29 @@ import { encode } from "../utils";
 import type { Methods, Google } from "../types";
 
 export default {
-  requestCode({ id, redirect, state }) {
+  requestCode({ id, redirect_uri, state }) {
     const url = "https://accounts.google.com/o/oauth2/v2/auth";
     const params = encode({
       scope: ["profile", "email"],
       response_type: "code",
       access_type: "offline",
       client_id: id,
-      redirect_uri: redirect,
-      state: state,
+      redirect_uri,
+      state,
     });
     return url + "?" + params;
   },
 
-  async requestToken({ id, secret, redirect, code }) {
+  async requestToken({ id, secret, code, redirect_uri }) {
     const response = await fetch("https://oauth2.googleapis.com/token", {
       method: "POST",
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
       body: encode({
+        grant_type: "authorization_code",
         client_id: id,
         client_secret: secret,
-        grant_type: "authorization_code",
-        code: code,
-        redirect_uri: redirect,
+        code,
+        redirect_uri,
       }),
     });
     if (response.status !== 200)

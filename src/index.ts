@@ -4,9 +4,9 @@ import {
   useLocation,
   useSearchParams,
 } from "solid-start";
-import providers from "./providers";
+import providers, { type Providers } from "./providers";
 import { encode, formatEnv } from "./utils";
-import type { Configuration, Methods, Providers } from "./types";
+import type { Configuration, Methods } from "./types";
 
 export default function OAuth(configuration: Configuration) {
   let errorURL: string;
@@ -23,15 +23,15 @@ export default function OAuth(configuration: Configuration) {
     if (!config.handler)
       return new Response("handler function missing in configuration");
 
-    const methods = providers[provider as keyof typeof providers];
+    const methods = providers[provider as Providers];
     if (!methods) return new Response(`'${provider}' provider doesn't exist`);
     const { requestCode, requestToken, requestUser }: Methods = methods;
 
-    const clientConfig = config[provider as keyof typeof providers];
+    const clientConfig = config[provider as Providers];
     if (!clientConfig.id || !clientConfig.secret)
       return new Response(`${provider} configuration is malformed`);
 
-    const apiConfig = { ...clientConfig, redirect: origin + pathname };
+    const apiConfig = { ...clientConfig, redirect_uri: origin + pathname };
 
     const fallback = searchParams.get("fallback");
     if (fallback) {
@@ -47,7 +47,7 @@ export default function OAuth(configuration: Configuration) {
       if (!code) throw new Error("missing code parameter in url");
       const { token_type, access_token } = await requestToken({
         ...apiConfig,
-        code: code,
+        code,
       });
       const user = await requestUser(`${token_type} ${access_token}`);
       return await config.handler(user, redirectURL);

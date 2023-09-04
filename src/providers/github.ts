@@ -2,17 +2,23 @@ import { encode } from "../utils";
 import type { GitHubUser, GithubEmails, Methods } from "../types";
 
 export default {
-  requestCode({ id, state }) {
+  requestCode({ id, redirect_uri, state }) {
     const url = "https://github.com/login/oauth/authorize";
-    const params = encode({ client_id: id, scope: "user:email", state: state });
+    const params = encode({
+      scope: "user:email",
+      client_id: id,
+      redirect_uri,
+      state,
+    });
     return url + "?" + params;
   },
 
-  async requestToken({ id, secret, code }) {
+  async requestToken({ id, secret, code, redirect_uri }) {
     const params = encode({
       client_id: id,
       client_secret: secret,
-      code: code,
+      code,
+      redirect_uri,
     });
     const response = await fetch(
       `https://github.com/login/oauth/access_token?${params}`,
