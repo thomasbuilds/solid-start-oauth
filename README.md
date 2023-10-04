@@ -1,4 +1,5 @@
 # OAuth2 for SolidStart
+[![NPM](https://img.shields.io/npm/v/solid-start-oauth.svg)](https://www.npmjs.com/package/solid-start-oauth)
 
 This package returns the `name`, `email` and `image` of user authenticated through third party services (Discord, GitHub, Google, Spotify).
 
@@ -14,7 +15,8 @@ pnpm add solid-start-oauth
 
 ## Configuration
 
-Your configuration can either be an object or a function. Use it as a function to have your variables in argument when your environment doesn't support `process.env` or `import.meta.env` (for example with Cloudflare).
+Your configuration can either be an object or a function.
+Use it as a function to have your variables in argument when your environment doesn't support `process.env` or `import.meta.env` (for example with Cloudflare).
 
 ```ts
 //api/oauth/[...oauth].ts
@@ -61,7 +63,8 @@ export default function Login() {
 }
 ```
 
-The package doesn’t provide the actual authentication for your app. This provides you complete control over redirections and you can seamlessly integrate multiple authentication methods sharing the same logic.
+The package doesn’t provide the actual authentication for your app.
+This provides you complete control over redirections and you can seamlessly integrate multiple authentication methods sharing the same logic.
 
 ```ts
 export async function signUp({ name, email, image }: User) {
@@ -88,4 +91,4 @@ export async function signIn({ id }: { id: string }, redirectTo?: string) {
 
 ## Contributions
 
-Please open issues for bugs and we much appreciate contributions regarding more provider support.
+Please open issues for bugs and we much appreciate contributions for more provider support.
